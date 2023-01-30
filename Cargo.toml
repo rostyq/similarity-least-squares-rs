@@ -1,0 +1,21 @@
+[package]
+name = "similarity-least-squares"
+version = "0.1.0"
+edition = "2021"
+authors = ["Rostyslav Bohomaz <rostyslav.db@gmail.com>"]
+description = "Least-squares estimation of transformation parameters between two point patterns"
+keywords = ["linear-algebra", "least-squares", "similarity", "transformation"]
+repository = "https://github.com/rostyq/similarity-least-squares-rs"
+license = "MIT"
+
+[[bench]]
+name = "main"
+harness = false
+
+[dependencies]
+nalgebra = { version = "0.32.1", default-features = false }
+
+[dev-dependencies]
+approx = { version = "0.5.1", default-features = false }
+criterion = "0.4.0"
+nalgebra = { version = "0.32.1", default-features = false, features = ["std"] }
