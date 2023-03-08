@@ -13,7 +13,10 @@ pub fn from_point_slices<T: RealField>(
     to: &[Point2<T>],
     eps: T,
     max_niter: usize,
-) -> Option<SimilarityMatrix2<T>> {
+) -> Option<SimilarityMatrix2<T>>
+where
+    DefaultAllocator: Allocator<T, U2, Dyn>,
+{
     from_matrices(
         point_slice_to_matrix(from),
         point_slice_to_matrix(to),
