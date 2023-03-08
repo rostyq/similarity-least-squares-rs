@@ -1,20 +1,34 @@
 pub extern crate nalgebra;
 
 use nalgebra::{
-    Matrix2, Point2, RealField, Rotation2, SMatrix, SimilarityMatrix2, Translation2, SVD,
+    allocator::Allocator,
+    constraint::{DimEq, ShapeConstraint},
+    DefaultAllocator, Dim, Dyn, Matrix, Matrix2, OMatrix, Point2, RawStorageMut, RealField,
+    Rotation2, SimilarityMatrix2, Translation2, SVD, U2,
 };
 
-pub fn from_point_arrays<T: RealField, const D: usize>(
-    from: &[Point2<T>; D],
-    to: &[Point2<T>; D],
-) -> Result<SimilarityMatrix2<T>, &'static str> {
-    from_smatrices(point_array_to_smatrix(from), point_array_to_smatrix(to))
+#[inline]
+pub fn from_point_slices<T: RealField>(
+    from: &[Point2<T>],
+    to: &[Point2<T>],
+    eps: T,
+    max_niter: usize,
+) -> Option<SimilarityMatrix2<T>> {
+    from_matrices(
+        point_slice_to_matrix(from),
+        point_slice_to_matrix(to),
+        eps,
+        max_niter,
+    )
 }
 
-pub fn point_array_to_smatrix<T: RealField, const D: usize>(
-    slice: &[Point2<T>; D],
-) -> SMatrix<T, 2, D> {
-    SMatrix::<T, 2, D>::from_iterator(
+#[inline]
+pub fn point_slice_to_matrix<T: RealField>(slice: &[Point2<T>]) -> OMatrix<T, U2, Dyn>
+where
+    DefaultAllocator: Allocator<T, U2, Dyn>,
+{
+    OMatrix::<T, U2, Dyn>::from_iterator(
+        slice.len(),
         slice
             .iter()
             .map(|p| p.coords.iter())
@@ -23,11 +37,23 @@ pub fn point_array_to_smatrix<T: RealField, const D: usize>(
     )
 }
 
-pub fn from_smatrices<T: RealField, const D: usize>(
-    mut from: SMatrix<T, 2, D>,
-    mut to: SMatrix<T, 2, D>,
-) -> Result<SimilarityMatrix2<T>, &'static str> {
-    let size_recip = T::from_usize(D).ok_or("Cannot convert usize to T")?.recip();
+#[inline]
+pub fn from_matrices<T, D1, D2, S>(
+    mut from: Matrix<T, U2, D1, S>,
+    mut to: Matrix<T, U2, D2, S>,
+    eps: T,
+    max_niter: usize,
+) -> Option<SimilarityMatrix2<T>>
+where
+    T: RealField,
+    D1: Dim,
+    D2: Dim,
+    ShapeConstraint: DimEq<D1, D2>,
+    S: RawStorageMut<T, U2, D1> + RawStorageMut<T, U2, D2>,
+{
+    let size_recip = T::from_usize(from.column_iter().count())
+        .expect("Cannot convert usize to T")
+        .recip();
 
     let mean_from = from.column_mean();
     let mean_to = to.column_mean();
@@ -58,10 +84,10 @@ pub fn from_smatrices<T: RealField, const D: usize>(
         u,
         v_t,
         singular_values,
-    } = cov.svd_unordered(true, true);
+    } = cov.try_svd_unordered(true, true, eps, max_niter)?;
 
-    let u = u.ok_or("Cannot obtain the left-singular vectors of the SVD")?;
-    let v_t = v_t.ok_or("Cannot obtain the right-singular vectors of the SVD")?;
+    let u = u?;
+    let v_t = v_t?;
     let d = Matrix2::from_diagonal(&singular_values);
 
     let mut s = Matrix2::identity();
@@ -86,7 +112,7 @@ pub fn from_smatrices<T: RealField, const D: usize>(
     let translation: Translation2<T> =
         (mean_to - (&rotation * mean_from).scale(scaling.to_owned())).into();
 
-    Ok(SimilarityMatrix2::from_parts(
+    Some(SimilarityMatrix2::from_parts(
         translation,
         rotation,
         scaling,

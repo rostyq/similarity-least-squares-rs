@@ -1,6 +1,6 @@
 [package]
 name = "similarity-least-squares"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Rostyslav Bohomaz <rostyslav.db@gmail.com>"]
 description = "Least-squares estimation of transformation parameters between two point patterns"

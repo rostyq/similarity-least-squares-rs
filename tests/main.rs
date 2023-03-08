@@ -38,14 +38,17 @@ mod tests {
                             .iter()
                             .map(|point| test.transform_point(point))
                             .collect();
-                        
+
                         println!("{:?}", from_points);
                         println!("{:?}\n", to_points);
 
-                        let transform = similarity_least_squares::from_point_arrays::<f32, 7>(
-                            &from_points.clone().try_into().unwrap(),
-                            &to_points.try_into().unwrap(),
-                        ).unwrap();
+                        let transform = similarity_least_squares::from_point_slices::<f32>(
+                            &from_points.as_slice(),
+                            &to_points.as_slice(),
+                            f32::EPSILON,
+                            0,
+                        )
+                        .unwrap();
 
                         assert_abs_diff_eq!(transform, test, epsilon = 0.001);
                     }

@@ -5,9 +5,11 @@ use similarity_least_squares;
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("three points", |b| {
         b.iter(|| {
-            similarity_least_squares::from_smatrices(
+            similarity_least_squares::from_matrices(
                 black_box(Matrix2x3::new(1.0, 1.0, -2.0, 0.0, 2.0, -0.5)),
                 black_box(Matrix2x3::new(-1.5, -1.5, -3.0, -2.0, -1.0, -2.25)),
+                f64::EPSILON,
+                0,
             )
             .unwrap();
         })
@@ -15,9 +17,11 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     c.bench_function("five points", |b| {
         b.iter(|| {
-            similarity_least_squares::from_smatrices(
+            similarity_least_squares::from_matrices(
                 black_box(Matrix2x3::new(1.0, 1.0, -2.0, 0.0, 2.0, -0.5)),
                 black_box(Matrix2x3::new(-1.5, -1.5, -3.0, -2.0, -1.0, -2.25)),
+                f64::EPSILON,
+                0,
             )
             .unwrap();
         })
@@ -25,13 +29,15 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     c.bench_function("seven points", |b| {
         b.iter(|| {
-            similarity_least_squares::from_smatrices(
+            similarity_least_squares::from_matrices(
                 black_box(SMatrix::<f64, 2, 7>::from_vec(vec![
                     0.0, 0.0, 1.0, 1.0, -2.0, 0.0, 2.0, -0.5, -1.0, -1.0, 1.0, 0.0, 0.0, 1.0,
                 ])),
                 black_box(SMatrix::<f64, 2, 7>::from_vec(vec![
                     0.0, -2.0, 1.5, -0.5, -3.0, -2.0, 3.0, -2.75, -1.5, -3.5, 1.5, -2.0, 0.0, -0.5,
                 ])),
+                f64::EPSILON,
+                0,
             )
             .unwrap();
         })
