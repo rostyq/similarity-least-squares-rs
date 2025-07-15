@@ -15,7 +15,7 @@ pub fn from_point_slices<T: RealField>(
     max_niter: usize,
 ) -> Option<SimilarityMatrix2<T>>
 where
-    DefaultAllocator: Allocator<T, U2, Dyn>,
+    DefaultAllocator: Allocator<U2, Dyn>,
 {
     from_matrices(
         point_slice_to_matrix(from),
@@ -28,7 +28,7 @@ where
 #[inline]
 pub fn point_slice_to_matrix<T: RealField>(slice: &[Point2<T>]) -> OMatrix<T, U2, Dyn>
 where
-    DefaultAllocator: Allocator<T, U2, Dyn>,
+    DefaultAllocator: Allocator<U2, Dyn>,
 {
     OMatrix::<T, U2, Dyn>::from_iterator(
         slice.len(),
