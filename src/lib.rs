@@ -1,21 +1,21 @@
 pub extern crate nalgebra;
 
 use nalgebra::{
-    allocator::Allocator,
     constraint::{DimEq, ShapeConstraint},
-    DefaultAllocator, Dim, Dyn, Matrix, Matrix2, OMatrix, Point2, RawStorageMut, RealField,
-    Rotation2, SimilarityMatrix2, Translation2, SVD, U2,
+    Dim, Matrix, Matrix2, RawStorageMut, RealField, Rotation2, SimilarityMatrix2,
+    Translation2, SVD, U2,
 };
 
+#[cfg(feature = "std")]
 #[inline]
 pub fn from_point_slices<T: RealField>(
-    from: &[Point2<T>],
-    to: &[Point2<T>],
+    from: &[nalgebra::Point2<T>],
+    to: &[nalgebra::Point2<T>],
     eps: T,
     max_niter: usize,
 ) -> Option<SimilarityMatrix2<T>>
 where
-    DefaultAllocator: Allocator<U2, Dyn>,
+    nalgebra::DefaultAllocator: nalgebra::allocator::Allocator<U2, nalgebra::Dyn>,
 {
     from_matrices(
         point_slice_to_matrix(from),
@@ -25,12 +25,15 @@ where
     )
 }
 
+#[cfg(feature = "std")]
 #[inline]
-pub fn point_slice_to_matrix<T: RealField>(slice: &[Point2<T>]) -> OMatrix<T, U2, Dyn>
+pub fn point_slice_to_matrix<T: RealField>(
+    slice: &[nalgebra::Point2<T>],
+) -> nalgebra::OMatrix<T, U2, nalgebra::Dyn>
 where
-    DefaultAllocator: Allocator<U2, Dyn>,
+    nalgebra::DefaultAllocator: nalgebra::allocator::Allocator<U2, nalgebra::Dyn>,
 {
-    OMatrix::<T, U2, Dyn>::from_iterator(
+    nalgebra::OMatrix::<T, U2, nalgebra::Dyn>::from_iterator(
         slice.len(),
         slice
             .iter()

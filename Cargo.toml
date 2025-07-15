@@ -12,6 +12,10 @@ license = "MIT"
 name = "main"
 harness = false
 
+[features]
+default = ["std"]
+std = ["nalgebra/std"]
+
 [dependencies]
 nalgebra = { version = "0.33", default-features = false }
 
