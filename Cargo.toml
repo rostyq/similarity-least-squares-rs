@@ -17,9 +17,9 @@ default = ["std"]
 std = ["nalgebra/std"]
 
 [dependencies]
-nalgebra = { version = "0.34", default-features = false }
+nalgebra = { version = "0.35", default-features = false }
 
 [dev-dependencies]
 approx = { version = "0.5", default-features = false }
 criterion = "0.6"
-nalgebra = { version = "0.34", default-features = false, features = ["std"] }
+nalgebra = { version = "0.35", default-features = false, features = ["std"] }
